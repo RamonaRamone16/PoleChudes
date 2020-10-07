@@ -9,6 +9,7 @@ using PoleChudes.DAL;
 using PoleChudes.DAL.Entities;
 using PoleChudes.BLL.AutoMapper;
 using AutoMapper;
+using PoleChudes.DAL.Seeds;
 
 namespace PoleChudes
 {
@@ -44,7 +45,7 @@ namespace PoleChudes
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, RoleManager<IdentityRole> roleManager, UserManager<User> userManager)
         {
             if (env.IsDevelopment())
             {
@@ -72,6 +73,8 @@ namespace PoleChudes
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
+
+            ApplicationDbInitializer.Seed(roleManager, userManager).ConfigureAwait(false);
         }
     }
 }

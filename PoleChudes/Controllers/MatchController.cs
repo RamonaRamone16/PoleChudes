@@ -21,7 +21,7 @@ namespace PoleChudes.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             var matches = _matchService.GetAll(user.Id);
-            return View(matches);
+            return View("AllMatches", matches);
         }
 
         public async Task<IActionResult> Create()

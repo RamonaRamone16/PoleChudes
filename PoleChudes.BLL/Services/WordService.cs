@@ -22,9 +22,11 @@ namespace PoleChudes.BLL.Services
         }
 
         //TODO: проверка на полномочия юзера
-        public async Task Create(WordCreateModel model)
+        public async Task Create(WordCreateModel model, string adminId)
         {
-            await _context.AddAsync(_mapper.Map<Word>(model));
+            var word = _mapper.Map<Word>(model);
+            word.AdminId = adminId;
+            await _context.AddAsync(word);
         }
 
         public async Task Update(int id, WordEditModel model)

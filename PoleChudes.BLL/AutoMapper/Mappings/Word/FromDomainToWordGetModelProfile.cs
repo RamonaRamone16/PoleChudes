@@ -13,7 +13,9 @@ namespace PoleChudes.BLL.AutoMapper.Mappings
 
         private void FromDomainToWordGetModelMappingProfile()
         {
-            CreateMap<Word, WordGetModel>();
+            CreateMap<Word, WordGetModel>()
+                .ForMember(target => target.AdminUserName, 
+                source => source.MapFrom(x => x.Admin.UserName));
         }
     }
 }
