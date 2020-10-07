@@ -1,5 +1,3 @@
-using System;
-
 namespace PoleChudes.Models
 {
     public class ErrorViewModel
