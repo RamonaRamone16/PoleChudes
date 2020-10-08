@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PoleChudes.BLL.Services;
 using PoleChudes.DAL.Entities;
+using System;
 using System.Threading.Tasks;
 
 namespace PoleChudes.Controllers
@@ -17,6 +19,7 @@ namespace PoleChudes.Controllers
             _userManager = userManager;
         }
 
+        [HttpPost]
         public async Task<IActionResult> GetAll()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -24,19 +27,47 @@ namespace PoleChudes.Controllers
             return View("AllMatches", matches);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Create()
         {
             var user = await _userManager.GetUserAsync(User);
-            //var match = _matchService.GetMatch(user.Id);
 
-            //HttpContext.Session.SetString("TempWord", value);
+            await _matchService.Create(user.Id);
+            var model = _matchService.GetMatchGetModel();
 
-            return View();
+            return View("Game", model);
         }
 
-        public async Task<IActionResult> GetGame()
+        [HttpGet]
+        public IActionResult CheckOneSymbol(string input)
         {
-            return View();
+            var word = HttpContext.Session.GetString("Word");
+            var hiddenWord = HttpContext.Session.GetString("HiddenWord");
+            var model = _matchService.GetMatchGetModel();
+
+            if (_matchService.CheckSuccessOneSymbol(hiddenWord, word, Char.Parse(input)))
+                model = _matchService.GetMatchGetModel();
+
+            return PartialView("_Game", model);
+        }
+
+        public IActionResult CheckWholeWord(string input)
+        {
+            var word = HttpContext.Session.GetString("Word");
+            if (_matchService.CheckSuccessWholeWord(word, input))
+                return View("Winner");
+            else
+                return View("GameOver");
+        }
+
+        public IActionResult DecrementPoints()
+        {
+            var points = HttpContext.Session.GetInt32("Points").Value - 1;
+            HttpContext.Session.SetInt32("Points", points);
+
+            var model = _matchService.GetMatchGetModel();
+
+            return PartialView("_Game", model);
         }
     }
 }
