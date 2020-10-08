@@ -14,6 +14,7 @@ namespace PoleChudes.BLL.AutoMapper
                     cfg.AddProfile(new FromDomainToWordGetModelProfile());
                     cfg.AddProfile(new FromDomainToMatchGetModelProfile());
                     cfg.AddProfile(new MatchCreateModelToDomainProfile());
+                    cfg.AddProfile(new FromDomainToWordModel());
                 });
         }
     }
