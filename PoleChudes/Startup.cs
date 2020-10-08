@@ -10,6 +10,7 @@ using PoleChudes.DAL.Entities;
 using PoleChudes.BLL.AutoMapper;
 using AutoMapper;
 using PoleChudes.DAL.Seeds;
+using PoleChudes.BLL.Services;
 
 namespace PoleChudes
 {
@@ -22,7 +23,6 @@ namespace PoleChudes
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDistributedMemoryCache();
@@ -33,18 +33,21 @@ namespace PoleChudes
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddIdentity<User, IdentityRole>()
+                .AddDefaultTokenProviders()
+                .AddDefaultUI()
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDBContext>();
 
-            //services.(typeof(MappingConfiguration));
+            services.AddScoped<MatchService>();
+            services.AddScoped<WordService>();
+
             services.AddAutoMapper(typeof(MappingConfiguration));
 
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, RoleManager<IdentityRole> roleManager, UserManager<User> userManager)
         {
             if (env.IsDevelopment())
@@ -55,7 +58,6 @@ namespace PoleChudes
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
@@ -74,7 +76,7 @@ namespace PoleChudes
                 endpoints.MapRazorPages();
             });
 
-            ApplicationDbInitializer.Seed(roleManager, userManager).ConfigureAwait(false);
+            ApplicationDbInitializer.Seed(roleManager, userManager).Wait();
         }
     }
 }

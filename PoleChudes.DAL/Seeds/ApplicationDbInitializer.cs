@@ -15,7 +15,7 @@ namespace PoleChudes.DAL.Seeds
             await SeedUsers(userManager);
         }
 
-        private static async Task SeedRoles(RoleManager<IdentityRole> roleManager)
+        public static async Task SeedRoles(RoleManager<IdentityRole> roleManager)
         {
             var roles = Enum.GetValues(typeof(Roles)).OfType<Roles>().ToList().Select(value => value.ToString());
             foreach (var role in roles)
@@ -28,13 +28,13 @@ namespace PoleChudes.DAL.Seeds
             }
         }
 
-        private static async Task SeedUsers(UserManager<User> userManager)
+        public static async Task SeedUsers(UserManager<User> userManager)
         {
             if (await userManager.FindByEmailAsync("admin@gmail.com") == null)
             {
                 var user = new User
                 {
-                    UserName = "admin",
+                    UserName = "admin@gmail.com",
                     Email = "admin@gmail.com"
                 };
 
@@ -45,7 +45,22 @@ namespace PoleChudes.DAL.Seeds
                     await userManager.AddToRoleAsync(user, Roles.Admin.ToString());
                 }
             }
-        }
 
+            if (await userManager.FindByEmailAsync("user@gmail.com") == null)
+            {
+                var user = new User
+                {
+                    UserName = "user@gmail.com",
+                    Email = "user@gmail.com"
+                };
+
+                IdentityResult result = await userManager.CreateAsync(user, "User-123");
+
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(user, Roles.User.ToString());
+                }
+            }
+        }
     }
 }
