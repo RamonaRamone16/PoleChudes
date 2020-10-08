@@ -3,8 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using PoleChudes.DAL;
 using PoleChudes.DAL.Entities;
 using PoleChudes.Models.Models;
-using PoleChudes.Models.Models.Word;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PoleChudes.BLL.Services
@@ -15,10 +16,12 @@ namespace PoleChudes.BLL.Services
         {
         }
 
-        public List<WordGetModel> GetAll()
+        public List<WordModel> GetAll()
         {
-            var words = _context.Words;
-            return _mapper.Map<List<WordGetModel>>(words);
+            var words = _context.Words
+                .ToList();
+
+            return _mapper.Map<List<WordModel>>(words);
         }
 
         //TODO: проверка на полномочия юзера
