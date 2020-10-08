@@ -1,10 +1,8 @@
-﻿using PoleChudes.Models.Models.Word;
-
-namespace PoleChudes.Models.Models
+﻿namespace PoleChudes.Models.Models
 {
     public class MatchGetModel : MatchCreateModel
     {
-        public string UserName { get; set; }
+        public string HiddenWord { get; set; }
         public WordGetModel Word { get; set; }
     }
 }
