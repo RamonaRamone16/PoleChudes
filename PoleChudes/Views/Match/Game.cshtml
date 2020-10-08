@@ -1,0 +1,90 @@
+﻿@model PoleChudes.Models.Models.MatchGetModel
+
+@{
+    ViewData["Title"] = "Game";
+}
+
+
+<div id="matchDisplay">
+    <h3>@Model.Word.Question</h3>
+    <h5 id="answer">Ответ: @Model.HiddenWord</h5>
+
+    <h6 id="points">Очки: @Model.Points</h6>
+</div>
+
+<h4 id="wrongInput" style="color: red; display: none;">Неверный формат ввода данных!</h4>
+
+<input type="text" name="input" value="" id="input" />
+<button onclick="getGame"></button>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script>
+        const getGame = () => {
+            $('#wrongInput').hide();
+
+             const input = $('#input').val();
+
+            if(input.length == @Model.HiddenWord)
+            {
+                $.ajax({
+                url: '@Url.Action("CheckWholeWord", "Match")',
+                type: "GET",
+                data: {
+                    input
+                },
+                success: function (data)
+                {
+                    $('#matchDisplay').html(data);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+                });
+            }
+            else if(input.length == 0)
+            {
+                $.ajax({
+                url: '@Url.Action("CheckOneSymbol", "Match")',
+                type: "GET",
+                data: {
+                    input
+                },
+                success: function (data)
+                {
+                    $('#matchDisplay').html(data);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+                });
+            }
+            else
+            {
+                $.ajax({
+                url: '@Url.Action("DecrementPoints", "Match")',
+                type: "GET",
+                data: {
+                    input
+                },
+                success: function (data)
+                {
+                    $('#wrongInput').show(data);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+                });
+            }
+        };
+
+        function() =>
+        {
+            $('#matchDisplay').html(@Model);
+        }
+
+</script>
+}
+
+

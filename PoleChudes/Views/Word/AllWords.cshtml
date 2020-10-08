@@ -1,42 +1,42 @@
-﻿@model IEnumerable<PoleChudes.Models.Models.Word.WordGetModel>
+﻿@model List<PoleChudes.Models.Models.WordModel>
 
 @{
     ViewData["Title"] = "AllWords";
 }
 
-<h1>All Words</h1>
+<h1>AllWords</h1>
 
-<a class="nav-link text-dark" asp-controller="Word" asp-action="Create">Create word</a>
-
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.AdminUserName)
+                Админ
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Question)
+                Вопрос
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Answer)
+                Слово
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.AdminUserName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Question)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Answer)
-                </td>
-            </tr>
-        }
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.AdminUserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Question)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Answer)
+            </td>
+        </tr>
+}
     </tbody>
 </table>
