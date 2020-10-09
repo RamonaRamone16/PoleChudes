@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PoleChudes.BLL.Services;
 using PoleChudes.DAL.Entities;
-using System;
 using System.Threading.Tasks;
 
 namespace PoleChudes.Controllers
@@ -39,32 +37,35 @@ namespace PoleChudes.Controllers
         }
 
         [HttpGet]
-        public IActionResult CheckOneSymbol(string input)
+        public IActionResult GetMatchGetModel()
         {
-            var word = HttpContext.Session.GetString("Word");
-            var hiddenWord = HttpContext.Session.GetString("HiddenWord");
             var model = _matchService.GetMatchGetModel();
 
-            if (_matchService.CheckSuccessOneSymbol(hiddenWord, word, Char.Parse(input)))
+            return PartialView("_Game", model);
+        }
+
+        [HttpGet]
+        public IActionResult CheckOneSymbol(string input)
+        {
+            var model = _matchService.GetMatchGetModel();
+
+            if (_matchService.CheckSuccessOneSymbol(input))
                 model = _matchService.GetMatchGetModel();
 
             return PartialView("_Game", model);
         }
 
-        public IActionResult CheckWholeWord(string input)
+        public async Task<IActionResult> CheckWholeWord(string input)
         {
-            var word = HttpContext.Session.GetString("Word");
-            if (_matchService.CheckSuccessWholeWord(word, input))
-                return View("Winner");
+            if (await _matchService.CheckSuccessWholeWord(input))
+                return PartialView("_Winner");
             else
-                return View("GameOver");
+                return PartialView("_GameOver");
         }
 
         public IActionResult DecrementPoints()
         {
-            var points = HttpContext.Session.GetInt32("Points").Value - 1;
-            HttpContext.Session.SetInt32("Points", points);
-
+            _matchService.DecrementPoints();
             var model = _matchService.GetMatchGetModel();
 
             return PartialView("_Game", model);

@@ -4,18 +4,16 @@
     ViewData["Title"] = "Game";
 }
 
+<div id="block">
+    <div id="matchDisplay">
+    </div>
 
-<div id="matchDisplay">
-    <h3>@Model.Word.Question</h3>
-    <h5 id="answer">Ответ: @Model.HiddenWord</h5>
+    <h4 id="wrongInput" style="color: red; display: none;">Неверный формат ввода данных!</h4>
 
-    <h6 id="points">Очки: @Model.Points</h6>
+    <input type="text" name="input" value="" id="input" />
+    <button onclick="getGame()" type="submit" class="btn btn-info"></button>
 </div>
 
-<h4 id="wrongInput" style="color: red; display: none;">Неверный формат ввода данных!</h4>
-
-<input type="text" name="input" value="" id="input" />
-<button onclick="getGame"></button>
 
 
 @section Scripts {
@@ -24,9 +22,9 @@
         const getGame = () => {
             $('#wrongInput').hide();
 
-             const input = $('#input').val();
+            const input = $('#input').val();
 
-            if(input.length == @Model.HiddenWord)
+            if(input.length == @Model.HiddenWord.Length)
             {
                 $.ajax({
                 url: '@Url.Action("CheckWholeWord", "Match")',
@@ -36,14 +34,14 @@
                 },
                 success: function (data)
                 {
-                    $('#matchDisplay').html(data);
+                    $('#block').html(data);
                 },
                 error: function (error) {
                     console.log(error);
                 }
                 });
             }
-            else if(input.length == 0)
+            else if(input.length == 1)
             {
                 $.ajax({
                 url: '@Url.Action("CheckOneSymbol", "Match")',
@@ -53,6 +51,7 @@
                 },
                 success: function (data)
                 {
+                    $('#input').val('');
                     $('#matchDisplay').html(data);
                 },
                 error: function (error) {
@@ -70,19 +69,24 @@
                 },
                 success: function (data)
                 {
-                    $('#wrongInput').show(data);
+                    $('#input').val('');
+                    $('#matchDisplay').html(data);
+                    $('#wrongInput').show();
                 },
                 error: function (error) {
                     console.log(error);
                 }
                 });
             }
-        };
+    };
 
-        function() =>
-        {
-            $('#matchDisplay').html(@Model);
-        }
+    const getNewGame = () => {
+        $('#matchDisplay').load('@Url.Action("GetMatchGetModel", "Match")');
+    };
+
+    $(function () {
+        getNewGame();
+    });
 
 </script>
 }
