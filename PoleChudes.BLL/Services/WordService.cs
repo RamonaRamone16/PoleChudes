@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using PoleChudes.DAL;
 using PoleChudes.DAL.Entities;
@@ -12,7 +13,7 @@ namespace PoleChudes.BLL.Services
 {
     public class WordService : BaseService
     {
-        public WordService(ApplicationDBContext context, IMapper mapper) : base(context, mapper)
+        public WordService(ApplicationDBContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor) : base(context, mapper, httpContextAccessor)
         {
         }
 
@@ -24,7 +25,6 @@ namespace PoleChudes.BLL.Services
             return _mapper.Map<List<WordModel>>(words);
         }
 
-        //TODO: проверка на полномочия юзера
         public async Task Create(WordCreateModel model, string adminId)
         {
             var word = _mapper.Map<Word>(model);
@@ -32,20 +32,35 @@ namespace PoleChudes.BLL.Services
             await _context.AddAsync(word);
         }
 
-        public async Task Update(int id, WordEditModel model)
+        public async Task Update(WordEditModel model)
         {
-            var word = await _context.Words.FirstOrDefaultAsync(x => x.Id == id);
+            var word = _context.Words.FirstOrDefault(x => x.Id == model.Id);
 
             _mapper.Map(model, word);
 
             await _context.UpdateAsync(word);
         }
 
+        public async Task<WordEditModel> GetWordEditModel(int id)
+        {
+            var word = _context.Words.FirstOrDefault(x => x.Id == id);
+            return _mapper.Map<WordEditModel>(word);
+        }
+
         public async Task Delete(int id)
         {
-            var word = await _context.Words.FirstOrDefaultAsync(x => x.Id == id);
+            var word = _context.Words.FirstOrDefault(x => x.Id == id);
 
             await _context.RemoveAsync(word);
+        }
+
+        public WordGetModel GetWordGetModel()
+        {
+            return new WordGetModel()
+            {
+                Question = Question,
+                Answer = Word
+            };
         }
     }
 }

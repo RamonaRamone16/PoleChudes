@@ -14,11 +14,13 @@ namespace PoleChudes.BLL.Services
 {
     public class MatchService : BaseService
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private Random  random;
-        public MatchService(ApplicationDBContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor) : base(context, mapper)
+        private Random random;
+        private WordService _wordService;
+
+        public MatchService(ApplicationDBContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor, WordService wordService) : base(context, mapper, httpContextAccessor)
         {
-            _httpContextAccessor = httpContextAccessor;
+            random = new Random();
+            _wordService = wordService;
         }
 
         public List<MatchGetModel> GetAll(string userId)
@@ -27,18 +29,16 @@ namespace PoleChudes.BLL.Services
             return _mapper.Map<List<MatchGetModel>>(matches);
         }
 
-        //TODO: проверка на полномочия юзера
         public async Task Create(string userId)
         {
             var lastWord = _context.Words.First();
-            random = new Random();
             int rnd;
 
             Word word;
 
             do
             {
-                rnd = random.Next(lastWord.Id+1);
+                rnd = random.Next(lastWord.Id + 1);
                 word = _context.Words.FirstOrDefault(x => x.Id == rnd);
             } while (word == null);
 
@@ -50,21 +50,23 @@ namespace PoleChudes.BLL.Services
 
             SetHiddenWord(rnd, word);
 
-            await _context.AddAsync(match);
+            var entity =  await _context.AddAsync(match);
+            MatchId = entity.Entity.Id;
         }
 
-        public async Task Update(int id, MatchEditModel model)
+        public async Task Update(bool success)
         {
-            var word = await _context.Matches.FirstOrDefaultAsync(x => x.Id == id);
+            var word = _context.Matches.FirstOrDefault(x => x.Id == MatchId);
 
-            _mapper.Map(model, word);
+            word.Successfully = success;
+            word.Points = Points;
 
             await _context.UpdateAsync(word);
         }
 
         public async Task Delete(int id)
         {
-            var word = await _context.Matches.FirstOrDefaultAsync(x => x.Id == id);
+            var word = _context.Matches.FirstOrDefault(x => x.Id == id);
 
             await _context.RemoveAsync(word);
         }
@@ -74,8 +76,8 @@ namespace PoleChudes.BLL.Services
             DecrementPoints();
             char input = Char.Parse(inputStr.ToLower());
 
-            var word = _httpContextAccessor.HttpContext.Session.GetString("Word");
-            var hiddenWord = _httpContextAccessor.HttpContext.Session.GetString("HiddenWord");
+            var word = Word;
+            var hiddenWord = HiddenWord;
 
             StringBuilder builder = new StringBuilder(hiddenWord);
             if (!hiddenWord.Contains(input) && word.Contains(input))
@@ -87,7 +89,7 @@ namespace PoleChudes.BLL.Services
                         builder[i] = input;
                     }
                 }
-                _httpContextAccessor.HttpContext.Session.SetString("HiddenWord", builder.ToString());
+                HiddenWord = builder.ToString();
                 return true;
             }
             return false;
@@ -96,27 +98,21 @@ namespace PoleChudes.BLL.Services
         public async Task<bool> CheckSuccessWholeWord(string input)
         {
             DecrementPoints();
-            var word = _httpContextAccessor.HttpContext.Session.GetString("Word");
-            int id = _httpContextAccessor.HttpContext.Session.GetInt32("WordId").Value;
-            int points = _httpContextAccessor.HttpContext.Session.GetInt32("Points").Value;
-            var wordModel = new MatchEditModel(){Points = points};
 
-            if (word.ToLower().Equals(input.ToLower()))
+            if (Word.ToLower().Equals(input.ToLower()))
             {
-                wordModel.Successfully = true;
-                await Update(id, wordModel);
+                await Update(true);
                 return true;
             }
 
-            wordModel.Successfully = false;
-            await Update(id, wordModel);
+            await Update(false);
             return false;
         }
 
         public void DecrementPoints()
         {
-            var points = _httpContextAccessor.HttpContext.Session.GetInt32("Points").Value - 1;
-            _httpContextAccessor.HttpContext.Session.SetInt32("Points", points);
+            var points = Points - 1;
+            Points = points;
         }
 
         public MatchGetModel GetMatchGetModel()
@@ -125,11 +121,54 @@ namespace PoleChudes.BLL.Services
             {
                 Word = new WordGetModel()
                 {
-                    Question = _httpContextAccessor.HttpContext.Session.GetString("Question"),
-                    Answer = _httpContextAccessor.HttpContext.Session.GetString("Word")
+                    Question = Question,
+                    Answer = Word
                 },
-                Points = _httpContextAccessor.HttpContext.Session.GetInt32("Points").Value,
-                HiddenWord = _httpContextAccessor.HttpContext.Session.GetString("HiddenWord")
+                Points = Points,
+                HiddenWord = HiddenWord
+            };
+        }
+
+        public async Task<bool> CheckPoints()
+        {
+            if (Points == 0)
+            {
+                await Update(false);
+                return false;
+            }
+            else
+                return true;
+        }
+
+        public GameOverModel GetModelIfPointsEnded()
+        {
+            return new GameOverModel()
+            {
+                Message = "У вас закончились очки!",
+                Signal = "Вы проирали!",
+                Word = _wordService.GetWordGetModel()
+            };
+        }
+
+        public GameOverModel GetModelIfNotGuessTheWord()
+        {
+            return new GameOverModel()
+            {
+                Message = "Вы не угадали слово!",
+                Signal = "Вы проирали!",
+                Word = _wordService.GetWordGetModel()
+            };
+        }
+
+
+        public GameOverModel GetModelIfGuessTheWord()
+        {
+            return new GameOverModel()
+            {
+                Message = "Вы угадали загаданное слово!",
+                Signal = "Вы выиграли!",
+                Success = true,
+                Word = _wordService.GetWordGetModel()
             };
         }
 
