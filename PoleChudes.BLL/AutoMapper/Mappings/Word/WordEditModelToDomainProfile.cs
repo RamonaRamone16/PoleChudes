@@ -13,7 +13,7 @@ namespace PoleChudes.BLL.AutoMapper.Mappings
 
         private void WordEditModelToWordMappingConfig()
         {
-            CreateMap<WordEditModel, Word>();
+            CreateMap<WordEditModel, Word>().ReverseMap();
         }
     }
 }
