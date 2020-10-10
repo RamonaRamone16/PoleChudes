@@ -38,5 +38,23 @@ namespace PoleChudes.Controllers
             await _wordService.Create(model, user.Id);
             return RedirectToAction("GetAll");
         }
+
+        public async Task<IActionResult> UpdateGet(int id)
+        {
+            var model = await _wordService.GetWordEditModel(id);
+            return View("Update", model);
+        }
+
+        public async Task<IActionResult> UpdatePut(WordEditModel model)
+        {
+            await _wordService.Update(model);
+            return RedirectToAction("GetAll");
+        }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _wordService.Delete(id);
+            return RedirectToAction("GetAll");
+        }
     }
 }

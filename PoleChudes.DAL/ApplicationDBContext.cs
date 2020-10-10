@@ -48,7 +48,7 @@ namespace PoleChudes.DAL
 
         public async ValueTask<EntityEntry<TEntity>> UpdateAsync<TEntity>(TEntity entity) where TEntity : BaseEntity<int>
         {
-            var entityEntry = base.Remove(entity);
+            var entityEntry = base.Update(entity);
             await SaveChangesAsync();
 
             return entityEntry;

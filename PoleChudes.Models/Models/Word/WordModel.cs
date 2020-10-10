@@ -1,6 +1,6 @@
 ﻿namespace PoleChudes.Models.Models
 {
-    public class WordModel : WordCreateModel
+    public class WordModel : WordEditModel
     {
         public string AdminUserName { get; set; }
     }

@@ -55,20 +55,31 @@ namespace PoleChudes.Controllers
             return PartialView("_Game", model);
         }
 
+        [HttpPost]
         public async Task<IActionResult> CheckWholeWord(string input)
         {
             if (await _matchService.CheckSuccessWholeWord(input))
-                return PartialView("_Winner");
+                return PartialView("_GameOver", _matchService.GetModelIfGuessTheWord());
             else
-                return PartialView("_GameOver");
+                return PartialView("_GameOver", _matchService.GetModelIfNotGuessTheWord());
         }
 
+        [HttpGet]
         public IActionResult DecrementPoints()
         {
             _matchService.DecrementPoints();
             var model = _matchService.GetMatchGetModel();
 
             return PartialView("_Game", model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CheckPoints()
+        {
+            if (await _matchService.CheckPoints())
+                return NoContent();
+            else
+                return PartialView("_GameOver", _matchService.GetModelIfPointsEnded());
         }
     }
 }
