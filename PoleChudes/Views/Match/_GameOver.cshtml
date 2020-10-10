@@ -1,1 +1,22 @@
-﻿<h2 style="color: red;">Вы проиграли!</h2>
+﻿@model PoleChudes.Models.Models.GameOverModel
+
+
+<h3>@Model.Word.Question</h3>
+<h4>@Model.Word.Answer</h4>
+
+<h5>@Model.Message</h5>
+
+@if (Model.Success)
+{
+    <h2 style="color: green;">@Model.Signal</h2>
+}
+else
+{
+    <h2 style="color: red;">@Model.Signal</h2>
+}
+
+<h6>Хотите новую игру?</h6>
+
+<a class="nav-link text-dark" asp-area="" asp-controller="Match" asp-action="Create">Да</a>
+
+<a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Нет</a>
