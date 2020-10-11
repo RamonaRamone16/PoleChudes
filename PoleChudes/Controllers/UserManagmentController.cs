@@ -6,7 +6,7 @@ using PoleChudes.Models.Models.User;
 
 namespace PoleChudes.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class UserManagmentController : Controller
     {
         private readonly UserManagmentService _userManagmentService;

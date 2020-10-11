@@ -47,9 +47,7 @@ namespace PoleChudes.BLL.Services
         {
             var lastWord = _context.Words.ToList().FindLast(x => x.Answer != null && x.Question != null);
             if (lastWord == null)
-            {
                 return false;
-            }
 
             int rnd;
 
