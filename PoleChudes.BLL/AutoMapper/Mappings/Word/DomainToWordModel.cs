@@ -4,9 +4,9 @@ using PoleChudes.Models.Models;
 
 namespace PoleChudes.BLL.AutoMapper.Mappings
 {
-    public class FromDomainToWordModel : Profile
+    public class DomainToWordModel : Profile
     {
-        public FromDomainToWordModel()
+        public DomainToWordModel()
         {
             FromWordToWordModelMappingProfile();
         }

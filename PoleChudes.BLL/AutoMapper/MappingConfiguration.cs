@@ -11,10 +11,14 @@ namespace PoleChudes.BLL.AutoMapper
                 {
                     cfg.AddProfile(new WordCreateModelToDomainProfile());
                     cfg.AddProfile(new WordEditModelToDomainProfile());
-                    cfg.AddProfile(new FromDomainToWordGetModelProfile());
-                    cfg.AddProfile(new FromDomainToMatchGetModelProfile());
+                    cfg.AddProfile(new DomainToWordGetModelProfile());
+                    cfg.AddProfile(new DomainToMatchGetModelProfile());
                     cfg.AddProfile(new MatchCreateModelToDomainProfile());
-                    cfg.AddProfile(new FromDomainToWordModel());
+                    cfg.AddProfile(new DomainToWordModel());
+                    cfg.AddProfile(new DomainToMatchModelProfile());
+                    cfg.AddProfile(new UserCreateModelToDomainProfile());
+                    cfg.AddProfile(new UserEditModelToDomainProfile());
+                    cfg.AddProfile(new DomainToUserGetModelProfile());
                 });
         }
     }
