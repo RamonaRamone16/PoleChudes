@@ -5,6 +5,7 @@
         public string Message { get; set; }
         public string Signal { get; set; }
         public bool Success { get; set; }
+        public int Points { get; set; }
         public WordGetModel Word { get; set; }
     }
 }
