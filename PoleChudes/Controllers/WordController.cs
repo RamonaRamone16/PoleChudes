@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PoleChudes.BLL.Services;
 using PoleChudes.DAL.Entities;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace PoleChudes.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class WordController : Controller
     {
         private readonly WordService _wordService;

@@ -7,6 +7,8 @@
   <ItemGroup>
     <Compile Remove="Migrations\20201010113754_IsDeletedDeleted.cs" />
     <Compile Remove="Migrations\20201010113754_IsDeletedDeleted.Designer.cs" />
+    <Compile Remove="Migrations\20201011112240_AddedIdToUser.cs" />
+    <Compile Remove="Migrations\20201011112240_AddedIdToUser.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

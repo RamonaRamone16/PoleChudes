@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PoleChudes.BLL.Services;
 using PoleChudes.DAL.Entities;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace PoleChudes.Controllers
 {
+    [Authorize]
     public class MatchController : Controller
     {
         private readonly MatchService _matchService;
@@ -37,10 +39,13 @@ namespace PoleChudes.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            await _matchService.Create(user.Id);
-            var model = _matchService.GetMatchGetModel();
-
-            return View("Game", model);
+            if (await _matchService.Create(user.Id))
+            {
+                var model = _matchService.GetMatchGetModel();
+                return View("Game", model);
+            }
+            else
+                return View("NoGame");
         }
 
         [HttpGet]

@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PoleChudes.BLL.Services;
-using PoleChudes.DAL.Entities;
 using PoleChudes.Models.Models.User;
 
 namespace PoleChudes.Controllers
 {
+    [Authorize]
     public class UserManagmentController : Controller
     {
         private readonly UserManagmentService _userManagmentService;
@@ -27,17 +24,32 @@ namespace PoleChudes.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public IActionResult CreateForAdmin()
         {
             var model = _userManagmentService.GetUserCreateModel();
-            return View(model);
+            return View("Create", model);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateForAdmin(UserCreateModel model)
+        {
+            await _userManagmentService.CreateUserForAdmin(model);
+            return RedirectToAction("GetAll");
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View("Register");
+        }
+
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Create(UserCreateModel model)
         {
             await _userManagmentService.CreateUser(model);
-            return RedirectToAction("GetAll");
+            return RedirectToAction("Index", "Home");
         }
 
         public async Task<IActionResult> UpdateGet(string id)

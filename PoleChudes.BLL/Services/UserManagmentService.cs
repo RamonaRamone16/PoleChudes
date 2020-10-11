@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PoleChudes.DAL;
 using PoleChudes.DAL.Entities;
+using PoleChudes.Models.Enums;
 using PoleChudes.Models.Models.User;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -31,11 +32,18 @@ namespace PoleChudes.BLL.Services
             return _mapper.Map<List<UserGetModel>>(users);
         }
 
-        public async Task CreateUser(UserCreateModel model)
+        public async Task CreateUserForAdmin(UserCreateModel model)
         {
             User user = _mapper.Map<User>(model);
             await _userManager.CreateAsync(user, model.Password);
             await _userManager.AddToRoleAsync(user, model.RoleName);
+        }
+
+        public async Task CreateUser(UserCreateModel model)
+        {
+            User user = _mapper.Map<User>(model);
+            await _userManager.CreateAsync(user, model.Password);
+            await _userManager.AddToRoleAsync(user, Roles.User.ToString());
         }
 
         public UserCreateModel GetUserCreateModel()
@@ -56,7 +64,6 @@ namespace PoleChudes.BLL.Services
             await _userManager.RemoveFromRolesAsync(user, roles);
 
             await _userManager.AddToRoleAsync(user, model.RoleName);
-            //await _signInManager.RefreshSignInAsync(user);
         }
 
         public async Task<UserEditModel> GetUserEditModel(string id)

@@ -43,9 +43,14 @@ namespace PoleChudes.BLL.Services
             return _mapper.Map<List<MatchModel>>(matches);
         }
 
-        public async Task Create(string userId)
+        public async Task<bool> Create(string userId)
         {
-            var lastWord = _context.Words.First();
+            var lastWord = _context.Words.ToList().FindLast(x => x.Answer != null && x.Question != null);
+            if (lastWord == null)
+            {
+                return false;
+            }
+
             int rnd;
 
             Word word;
@@ -66,6 +71,8 @@ namespace PoleChudes.BLL.Services
 
             var entity =  await _context.AddAsync(match);
             MatchId = entity.Entity.Id;
+
+            return true;
         }
 
         public async Task Update(bool success)
