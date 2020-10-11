@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PoleChudes.DAL.Entities;
-using System.Data.Entity.ModelConfiguration;
 
 namespace PoleChudes.DAL.EntitiesConfigurations
 {
-    public class MatchConfiguration : EntityTypeConfiguration<Match>
+    public class MatchConfiguration : IEntityTypeConfiguration<Match>
     {
         public void Configure(EntityTypeBuilder<Match> builder)
         {

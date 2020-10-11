@@ -7,7 +7,7 @@ namespace PoleChudes.DAL.Entities
         TKey Id { get; set; }
     }
 
-    public interface IEntityBase : IDeletionTrackable, IModificationTrackable, ICreationTrackable
+    public interface IEntityBase : IModificationTrackable, ICreationTrackable
     {
     }
 }
