@@ -30,7 +30,10 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Word" asp-action="GetAll">Words</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="UserManagement" asp-action="GetAllUsers">Users</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="UserManagment" asp-action="GetAll">Users</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Match" asp-action="GetAll">All Matches</a>
                             </li>
                         }
                         @if (SignInManager.IsSignedIn(User) && (User.IsInRole("User")))

@@ -1,0 +1,52 @@
+﻿@model List<PoleChudes.Models.Models.MatchGetModel>
+
+@{
+    ViewData["Title"] = "AllMatches";
+}
+
+<h1>All Matches</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Вопрос
+            </th>
+            <th>
+                Слово
+            </th>
+            <th>
+                Успешно
+            </th>
+            <th>
+                Очки
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Word.Question)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Word.Answer)
+            </td>
+            <td>
+                @if (item.Successfully)
+                {
+                    <p>Да</p>
+                }
+                else
+                { 
+                    <p>Нет</p>
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Points)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

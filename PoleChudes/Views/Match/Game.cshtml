@@ -11,7 +11,7 @@
     <h4 id="wrongInput" style="color: red; display: none;">Неверный формат ввода данных!</h4>
 
     <input type="text" name="input" value="" id="input" />
-    <button onclick="getGame()" type="submit" class="btn btn-info"></button>
+    <button onclick="getGame()" type="submit" class="btn btn-info">Отправить</button>
 </div>
 
 
@@ -68,6 +68,7 @@
                 {
                     $('#input').val('');
                     $('#matchDisplay').html(data);
+                    checkHiddenWord();
                 },
                 error: function (error) {
                     console.log(error);
@@ -96,6 +97,21 @@
 
     const getNewGame = () => {
         $('#matchDisplay').load('@Url.Action("GetMatchGetModel", "Match")');
+    };
+
+
+    const checkHiddenWord = () => {
+        $.ajax({
+                url: '@Url.Action("CheckHiddenWord", "Match")',
+                type: "GET",
+                success: function (data)
+                {
+                    $('#block').html(data);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
     };
 
     $(function () {
