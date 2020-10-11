@@ -17,12 +17,19 @@ namespace PoleChudes.Controllers
             _userManager = userManager;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> GetAll()
+        [HttpGet]
+        public async Task<IActionResult> GetAllByUserId()
         {
             var user = await _userManager.GetUserAsync(User);
-            var matches = _matchService.GetAll(user.Id);
-            return View("AllMatches", matches);
+            var matches = await _matchService.GetAllByUserId(user.Id);
+            return View("AllMatchesForUser", matches);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var matches = await _matchService.GetAll();
+            return View("AllMatchesForAdmin", matches);
         }
 
         [HttpGet]
@@ -67,7 +74,7 @@ namespace PoleChudes.Controllers
         [HttpGet]
         public IActionResult DecrementPoints()
         {
-            _matchService.DecrementPoints();
+            _matchService.Points--;
             var model = _matchService.GetMatchGetModel();
 
             return PartialView("_Game", model);
@@ -80,6 +87,16 @@ namespace PoleChudes.Controllers
                 return NoContent();
             else
                 return PartialView("_GameOver", _matchService.GetModelIfPointsEnded());
+        }
+
+
+        [HttpGet]
+        public IActionResult CheckHiddenWord()
+        {
+            if (_matchService.HiddenWord.ToLower().Equals(_matchService.Word.ToLower()))
+                return PartialView("_GameOver", _matchService.GetModelIfGuessTheWord());
+            else
+                return NoContent();
         }
     }
 }

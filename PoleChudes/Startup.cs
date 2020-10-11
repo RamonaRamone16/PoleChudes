@@ -41,6 +41,7 @@ namespace PoleChudes
 
             services.AddScoped<MatchService>();
             services.AddScoped<WordService>();
+            services.AddScoped<UserManagmentService>();
 
             services.AddAutoMapper(typeof(MappingConfiguration));
 

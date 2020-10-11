@@ -19,7 +19,7 @@ namespace PoleChudes.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public IActionResult GetAll()
         {
             var words = _wordService.GetAll();
             return View("AllWords", words);
