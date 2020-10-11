@@ -5,7 +5,6 @@ using PoleChudes.DAL;
 using PoleChudes.DAL.Entities;
 using PoleChudes.Models.Models;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,8 +18,7 @@ namespace PoleChudes.BLL.Services
 
         public List<WordModel> GetAll()
         {
-            var words = _context.Words
-                .ToList();
+            var words = _context.Words.Include(x => x.Admin).ToList();
 
             return _mapper.Map<List<WordModel>>(words);
         }
@@ -34,7 +32,7 @@ namespace PoleChudes.BLL.Services
 
         public async Task Update(WordEditModel model)
         {
-            var word = _context.Words.FirstOrDefault(x => x.Id == model.Id);
+            var word = await _context.Words.FirstOrDefaultAsync(x => x.Id == model.Id);
 
             _mapper.Map(model, word);
 
@@ -43,7 +41,7 @@ namespace PoleChudes.BLL.Services
 
         public async Task<WordEditModel> GetWordEditModel(int id)
         {
-            var word = _context.Words.FirstOrDefault(x => x.Id == id);
+            var word = await _context.Words.FirstOrDefaultAsync(x => x.Id == id);
             return _mapper.Map<WordEditModel>(word);
         }
 

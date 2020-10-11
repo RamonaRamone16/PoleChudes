@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using PoleChudes.DAL;
 using PoleChudes.DAL.Entities;
 using PoleChudes.Models.Models;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,19 +14,33 @@ namespace PoleChudes.BLL.Services
 {
     public class MatchService : BaseService
     {
-        private Random random;
-        private WordService _wordService;
+        private readonly Random _random;
+        private readonly WordService _wordService;
 
         public MatchService(ApplicationDBContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor, WordService wordService) : base(context, mapper, httpContextAccessor)
         {
-            random = new Random();
+            _random = new Random();
             _wordService = wordService;
         }
 
-        public List<MatchGetModel> GetAll(string userId)
+        public async Task<List<MatchGetModel>> GetAllByUserId(string userId)
         {
-            var matches = _context.Matches.Where(x => x.UserId == userId);
+            var matches = await _context.Matches
+                .Where(x => x.UserId == userId)
+                .Include(x => x.Word)
+                .ToListAsync();
+
             return _mapper.Map<List<MatchGetModel>>(matches);
+        }
+
+        public async Task<List<MatchModel>> GetAll()
+        {
+            var matches = await _context.Matches
+                .Include(x => x.User)
+                .Include(x => x.Word)
+                .ToListAsync();
+
+            return _mapper.Map<List<MatchModel>>(matches);
         }
 
         public async Task Create(string userId)
@@ -38,7 +52,7 @@ namespace PoleChudes.BLL.Services
 
             do
             {
-                rnd = random.Next(lastWord.Id + 1);
+                rnd = _random.Next(lastWord.Id + 1);
                 word = _context.Words.FirstOrDefault(x => x.Id == rnd);
             } while (word == null);
 
@@ -56,7 +70,7 @@ namespace PoleChudes.BLL.Services
 
         public async Task Update(bool success)
         {
-            var word = _context.Matches.FirstOrDefault(x => x.Id == MatchId);
+            var word = await _context.Matches.FirstOrDefaultAsync(x => x.Id == MatchId);
 
             word.Successfully = success;
             word.Points = Points;
@@ -66,14 +80,13 @@ namespace PoleChudes.BLL.Services
 
         public async Task Delete(int id)
         {
-            var word = _context.Matches.FirstOrDefault(x => x.Id == id);
+            var word = await _context.Matches.FirstOrDefaultAsync(x => x.Id == id);
 
             await _context.RemoveAsync(word);
         }
 
         public bool CheckSuccessOneSymbol(string inputStr)
         {
-            DecrementPoints();
             char input = Char.Parse(inputStr.ToLower());
 
             var word = Word;
@@ -90,29 +103,25 @@ namespace PoleChudes.BLL.Services
                     }
                 }
                 HiddenWord = builder.ToString();
+                Points++;
                 return true;
             }
+            Points--;
             return false;
         }
 
         public async Task<bool> CheckSuccessWholeWord(string input)
         {
-            DecrementPoints();
-
             if (Word.ToLower().Equals(input.ToLower()))
             {
+                Points += 3;
                 await Update(true);
                 return true;
             }
 
+            Points -= 3;
             await Update(false);
             return false;
-        }
-
-        public void DecrementPoints()
-        {
-            var points = Points - 1;
-            Points = points;
         }
 
         public MatchGetModel GetMatchGetModel()
@@ -146,6 +155,7 @@ namespace PoleChudes.BLL.Services
             {
                 Message = "У вас закончились очки!",
                 Signal = "Вы проирали!",
+                Points = Points,
                 Word = _wordService.GetWordGetModel()
             };
         }
@@ -156,6 +166,7 @@ namespace PoleChudes.BLL.Services
             {
                 Message = "Вы не угадали слово!",
                 Signal = "Вы проирали!",
+                Points = Points,
                 Word = _wordService.GetWordGetModel()
             };
         }
@@ -168,6 +179,7 @@ namespace PoleChudes.BLL.Services
                 Message = "Вы угадали загаданное слово!",
                 Signal = "Вы выиграли!",
                 Success = true,
+                Points = Points,
                 Word = _wordService.GetWordGetModel()
             };
         }
